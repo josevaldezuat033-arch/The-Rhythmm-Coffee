@@ -1,3 +1,10 @@
+let allProducts = [];
+let allEvents = [];
+let searchTerm = '';
+let currentCategory = 'all';
+let cart = JSON.parse(localStorage.getItem('trc_cart') || '[]');
+let currentUser = JSON.parse(localStorage.getItem('trc_user') || 'null');
+
 const API_URL =
     window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:3000/api'
