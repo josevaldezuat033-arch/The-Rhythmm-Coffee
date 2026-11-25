@@ -3,24 +3,31 @@
    ========================================== */
 
 const express = require('express');
+const cors = require('cors');
 const mysql = require('mysql2');
 const bcrypt = require('bcrypt');
 const path = require('path');
 require('dotenv').config();
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Servir archivos estáticos del frontend
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-// Conexión a Base de Datos relacional MySQL
+// Conexión a Base de Datos relacional MySQL (compatible con local y nube)
+const sslConfig = process.env.DB_SSL === 'true'
+    ? { rejectUnauthorized: false }
+    : undefined;
+
 const db = mysql.createConnection({
     host: process.env.DB_HOST || 'localhost',
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
     database: process.env.DB_NAME || 'the_rhythm_coffee',
-    port: process.env.DB_PORT || 3306
+    port: Number(process.env.DB_PORT) || 3306,
+    ...(sslConfig ? { ssl: sslConfig } : {})
 });
 
 db.connect((err) => {
@@ -139,24 +146,7 @@ function procesarOrden(req, res) {
                     if (stockActual < cantSolicitada) {
                         return db.rollback(() => {
                             res.status(400).json({
-                                error: `Inventario insuficiente para "${prod.nombre}". Disponible: ${stockActual}, solicitado: ${cantSolicitada}`
-                            });
-                        });
-                    }
-
-                    subtotalReal += precioReal * cantSolicitada;
-                    partidas.push({
-                        product_id: prod.id,
-                        sku_snapshot: prod.sku,
-                        nombre_snapshot: prod.nombre,
-                        precio_unitario: precioReal,
-                        cantidad: cantSolicitada
-                    });
-                }
-
-                const envio = subtotalReal > 500 ? 0 : 99;
-                const totalFinal = subtotalReal + envio;
-                const folioPedido = `TRC-${Date.now().toString().slice(-6)}`;
+                                error: `Inventario insuficiente para "${prod.nombre}". Disponible: ${stockActual}, solicitado: ${cantSolicitada}` }); }); }  subtotalReal += precioReal * cantSolicitada; partidas.push({ product_id: prod.id, sku_snapshot: prod.sku, nombre_snapshot: prod.nombre, precio_unitario: precioReal, cantidad: cantSolicitada }); }  const envio = subtotalReal > 500 ? 0 : 99; const totalFinal = subtotalReal + envio; const folioPedido = `TRC-${Date.now().toString().slice(-6)}`;
 
                 db.query(
                     `INSERT INTO orders (folio, user_id, direccion_envio, subtotal, envio, total, estado)
