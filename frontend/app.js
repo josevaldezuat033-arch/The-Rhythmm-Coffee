@@ -1,10 +1,7 @@
-const API_URL = 'http://localhost:3000/api';
-let cart = JSON.parse(localStorage.getItem('trc_cart')) || [];
-let allProducts = [];
-let allEvents = [];
-let currentCategory = 'all';
-let searchTerm = '';
-let currentUser = JSON.parse(localStorage.getItem('trc_user')) || null;
+const API_URL =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000/api'
+        : '/api';
 
 function getFallbackImage(title, tag = 'THE RHYTHM COFFEE', bg1 = '#3b141c', bg2 = '#6b2737', accent = '#f3d5b5', kind = 'generic') {
     const safeTitle = String(title || 'The Rhythm Coffee').slice(0, 26);
