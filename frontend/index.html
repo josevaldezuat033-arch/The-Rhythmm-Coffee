@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Rhythm Coffee | Café de Especialidad y Música</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- ENCABEZADO Y NAVEGACIÓN -->
+    <header class="navbar">
+        <div class="logo">
+            <h1>☕ The Rhythm Coffee</h1>
+            <p>Café de especialidad, texturas retro y música en vivo.</p>
+        </div>
+        <nav class="nav-links">
+            <a href="#inicio">Inicio</a>
+            <a href="#catalogo">Catálogo</a>
+            <a href="#carrito-section">Carrito (<span id="nav-cart-count">0</span>)</a>
+            <a href="#ayuda-politicas">Ayuda y Políticas</a>
+            <button class="btn-outline" onclick="abrirModalCuenta()">👤 <span id="user-status">Cuenta / Seguimiento</span></button>
+            <a href="admin.html" class="btn-admin-link">⚙️ Admin</a>
+        </nav>
+    </header>
+
+    <!-- 1. VISTA INICIO (Propuesta de valor y destacados) -->
+    <section id="inicio" class="hero-section">
+        <div class="hero-content">
+            <span class="badge">Edición Especialidad & Vinilo</span>
+            <h2>Donde cada taza tiene su propio ritmo</h2>
+            <p>Conectamos granos mexicanos de altura con la escena musical independiente. Explora nuestro catálogo, reserva tu lugar en sesiones acústicas y recibe café recién tostado hasta tu puerta.</p>
+            <div class="hero-actions">
+                <a href="#catalogo" class="btn-primary">Explorar Catálogo</a>
+                <button class="btn-secondary" onclick="abrirModalCuenta()">Rastrear mi Pedido</button>
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <!-- 2. VISTA CATÁLOGO (Filtros y Ordenamiento) -->
+        <section id="catalogo" class="section-block">
+            <h2>Nuestro Menú y Catálogo</h2>
+            <div class="controls-bar">
+                <input type="text" id="search-input" placeholder="🔍 Buscar café, SKU, accesorios o eventos...">
+                <select id="sort-select" onchange="applyFilters()">
+                    <option value="default">Ordenar por: Destacados</option>
+                    <option value="price-asc">Precio: Menor a Mayor</option>
+                    <option value="price-desc">Precio: Mayor a Menor</option>
+                </select>
+            </div>
+        <div class="filter-buttons">
+                <button class="filter-btn active" data-category="all">Todos</button>
+                <button class="filter-btn" data-category="Bebidas">Bebidas</button>
+                <button class="filter-btn" data-category="Postres">Postres</button>
+                <button class="filter-btn" data-category="Cafe">Café en Grano</button>
+                <button class="filter-btn" data-category="Accesorios">Accesorios</button>
+                <button class="filter-btn" data-category="Musica">Experiencias y Música</button>
+            </div>
+
+            <div id="products-container" class="grid-container">
+                <p>Cargando catálogo...</p>
+            </div>
+        </section>
+
+        <!-- EVENTOS MUSICALES -->
+        <section id="eventos" class="section-block">
+            <h2>🎸 Cartelera de Sesiones Acústicas</h2>
+            <div id="events-container" class="grid-container"></div>
+        </section>
+
+        <!-- 3. VISTA CARRITO (Cantidades editables y resumen) -->
+        <section id="carrito-section" class="section-block cart-box">
+            <h2>🛒 Tu Carrito</h2>
+            <div id="cart-items">
+                <p>Tu carrito está vacío.</p>
+            </div>
+            <div class="cart-summary">
+                <p class="tax-note">* Precios en MXN. IVA incluido. Envío calculado al confirmar.</p>
+                <h3>Total: $<span id="cart-total">0.00</span> MXN</h3>
+                <button id="checkout-btn" class="btn-primary" disabled>Proceder al Pago</button>
+            </div>
+        </section>
+
+        <!-- 4. VISTA AYUDA Y POLÍTICAS -->
+        <section id="ayuda-politicas" class="section-block policies-grid">
+            <div class="policy-card">
+                <h3>📦 Envíos y Entregas</h3>
+                <p>Envío estándar local (24-48 hrs) por $60.00 MXN o recolección gratuita en sucursal Av. Melómana #404 (Ficticio - Fines Académicos).</p>
+            </div>
+            <div class="policy-card">
+                <h3>🔄 Devoluciones y Garantía</h3>
+                <p>Garantía de frescura en café en grano. Cambios y devoluciones en accesorios y vinilos dentro de los primeros 15 días con empaque original.</p>
+            </div>
+            <div class="policy-card">
+                <h3>🔒 Privacidad y Términos</h3>
+                <p>Tus datos se usan exclusivamente para procesar tu orden. Plataforma académica con pasarela Sandbox (no ingresar tarjetas reales).</p>
+            </div>
+            <div class="policy-card">
+                <h3>💬 Contacto y Soporte</h3>
+                <p>¿Dudas con tu orden? Escríbenos a <strong>contacto@therhythmcoffee-academic.com</strong> o rastrea tu folio en la sección de Cuenta.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL 1: DETALLE DE PRODUCTO -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="cerrarModal('product-modal')">&times;</span>
+            <div id="modal-product-body"></div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CUENTA DEL CLIENTE Y SEGUIMIENTO DE PEDIDOS -->
+    <div id="account-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="cerrarModal('account-modal')">&times;</span>
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('tab-login')">Mi Cuenta</button>
+                <button class="tab-btn" onclick="switchTab('tab-tracking')">Seguimiento de Pedido</button>
+            </div>
+
+            <!-- Pestaña Cuenta -->
+            <div id="tab-login" class="tab-content active">
+                <h3>Acceso de Cliente</h3>
+                <form id="auth-form" onsubmit="manejarAuth(event)">
+                    <label>Nombre completo (para registro):</label>
+                    <input type="text" id="auth-name" placeholder="Ej. Carlos Mendoza">
+                    <label>Correo electrónico:</label>
+                    <input type="email" id="auth-email" required placeholder="cliente@ejemplo.com">
+                    <label>Contraseña:</label>
+                    <input type="password" id="auth-pass" required placeholder="••••••••">
+                    <button type="submit" class="btn-primary">Iniciar Sesión / Registrar</button>
+                </form>
+                <div id="user-profile-info" style="display:none; margin-top: 15px;">
+                    <p>Sesión activa como: <strong id="logged-user-name"></strong></p>
+                    <button class="btn-outline" onclick="cerrarSesion()">Cerrar Sesión</button>
+                </div>
+            </div>
+
+            <!-- Pestaña Seguimiento -->
+            <div id="tab-tracking" class="tab-content" style="display:none;">
+                <h3>Rastrear Pedido por Folio</h3>
+                <div class="tracking-box">
+                    <input type="text" id="tracking-folio" placeholder="Ej. TRC-1731950000">
+                    <button class="btn-primary" onclick="buscarPedido()">Buscar</button>
+                </div>
+                <div id="tracking-result" class="tracking-result"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2026 The Rhythm Coffee - Proyecto Integrador Comercio Electrónico (Fines Académicos).</p>
+    </footer>
+
+    <script src="app.js"></script>
+
+    
+</body>
+</html>
